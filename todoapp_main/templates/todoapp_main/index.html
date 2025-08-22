@@ -1,0 +1,142 @@
+{% extends "base.html" %} {% block content %}
+<div>
+  {% if not user.is_authenticated %}
+  <div class="task-list__empty">
+    <p>Login and your tasks will appear here.</p>
+  </div>
+  {% else %}
+
+  <div class="task-list__add">
+    <h4>Add a new task</h4>
+    <form
+      method="POST"
+      action="{% url 'create_task' %}"
+      class="task-list__form"
+    >
+      {% csrf_token %}
+      <div class="task-list__form-line1">
+        <input type="text" name="title" placeholder="Title" required />
+        <select name="priority" required>
+          <option value="">Select Priority</option>
+          <option value="high">High Priority</option>
+          <option value="medium">Medium Priority</option>
+          <option value="low">Low Priority</option>
+        </select>
+        <input type="date" name="deadline" placeholder="Deadline" />
+      </div>
+      <div class="task-list__form-line2">
+        <textarea
+          name="description"
+          placeholder="Description"
+          required
+        ></textarea>
+      </div>
+      <div class="task-list__form-line3">
+        <button type="submit">Create</button>
+      </div>
+    </form>
+
+    {% if messages %}
+    <ul class="message-list">
+      {% for message in messages %}
+      <li class="message--{{ message.tags }}">{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+  </div>
+
+  <h1>Your Tasks</h1>
+  <div class="filters">
+    <h3>Filter by Priority:</h3>
+    <a
+      href="?priority=high"
+      class="{% if request.GET.priority == 'high' %}active{% else %}inactive{% endif %}"
+      >High</a
+    >
+    <a
+      href="?priority=medium"
+      class="{% if request.GET.priority == 'medium' %}active{% else %}inactive{% endif %}"
+      >Medium</a
+    >
+    <a
+      href="?priority=low"
+      class="{% if request.GET.priority == 'low' %}active{% else %}inactive{% endif %}"
+      >Low</a
+    >
+  </div>
+
+  <div class="filters">
+    <h3>Filter by Status:</h3>
+    <a
+      href="?status=pending"
+      class="{% if request.GET.status == 'pending' %}active{% else %}inactive{% endif %}"
+      >Pending</a
+    >
+    <a
+      href="?status=done"
+      class="{% if request.GET.status == 'done' %}active{% else %}inactive{% endif %}"
+      >Done</a
+    >
+
+    <a
+      href="?status=cancelled"
+      class="{% if request.GET.status == 'cancelled' %}active{% else %}inactive{% endif %}"
+      >Cancelled</a
+    >
+  </div>
+
+  <div class="no-filter-link">
+    <a
+      href="/"
+      class="{% if not request.GET.priority and not request.GET.status %}active{% else %}inactive{% endif %}"
+      >Remove Filters</a
+    >
+  </div>
+
+  {% if not tasks %}
+  <div>
+    <p>No tasks found.</p>
+  </div>
+  {% else %}
+  <div>
+    <ul class="task-list">
+      {% for task in tasks %}
+      <li class="task-list__item">
+        <div class="task-list__heading">
+          <h4>{{ task.title }}</h4>
+          <p class="task-list__priority-tag">{{ task.priority }}</p>
+          <p class="task-list__status-tag">{{ task.status }}</p>
+        </div>
+
+        <p class="task-list__description">
+          Description: {{ task.description }}
+        </p>
+        <p
+          class="task-list__deadline {% if task.deadline < now %}task-list__deadline--red{% endif %}"
+        >
+          Deadline: {{ task.deadline }}
+        </p>
+
+        <div class="task-list__actions">
+          <form method="post" action="{% url 'update_task_status' task.id %}">
+            {% csrf_token %}
+            <button type="submit" name="status" value="done" class="btn-done">
+              Mark Done
+            </button>
+            <button
+              type="submit"
+              name="status"
+              value="cancelled"
+              class="btn-cancel"
+            >
+              Cancel
+            </button>
+          </form>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %} {% endif %}
+</div>
+{% endblock %}

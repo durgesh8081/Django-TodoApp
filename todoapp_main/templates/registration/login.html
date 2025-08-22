@@ -1,0 +1,30 @@
+{% extends "base.html" %} {% block content %}
+<div class="auth">
+  <div class="auth__card">
+    <h3 class="auth__title">Login</h3>
+
+    {% if form.errors %}
+    <div class="auth__error">
+      Your username and password didn’t match. Please try again.
+    </div>
+    {% endif %}
+
+    <form method="post" class="auth__form">
+      {% csrf_token %} {{ form.as_p }}
+      <button type="submit" class="auth__btn">Login</button>
+    </form>
+
+    <div class="auth__footer">
+      <!-- <p class="mb-1">
+        <a href="{% url 'password_reset' %}" class="auth__link">
+          Forgot your password?
+        </a>
+      </p> -->
+      <p>
+        Don't have an account?
+        <a href="{% url 'signup' %}" class="auth__link">Sign up</a>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}
