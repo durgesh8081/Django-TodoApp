@@ -22,10 +22,17 @@
         <div class="navbar__actions">
           {% if user.is_authenticated %}
           <span class="navbar__user">Hello, {{ user.username }}!</span>
-          <a href="{% url 'logout' %}" class="navbar__btn navbar__btn--outline">
-            Logout
-          </a>
-          {% else %}
+          <form
+            action="{% url 'logout' %}"
+            method="post"
+            style="display: inline"
+          >
+            {% csrf_token %}
+            <button type="submit" class="navbar__btn navbar__btn--outline">
+              Logout
+            </button>
+          </form>
+
           <a href="{% url 'login' %}" class="navbar__btn navbar__btn--outline">
             Login
           </a>
